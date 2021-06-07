@@ -1,26 +1,41 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <!-- <div id="nav">
+        <router-link to="/">Home</router-link> |
+        <router-link to="/about">About</router-link>
+    </div> -->
+    <div
+        class="w-full h-full   bg-gradient-to-r from-blue-400 bg-blue-600 overflow-hidden"
+    >
+        <router-view />
+    </div>
 </template>
-
-<script>
-import HelloWorld from './components/HelloWorld.vue'
-
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
-</script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+    width: 100vw;
+    height: 100vh;
+}
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.btn {
+    @apply focus:outline-none px-3 py-1 bg-blue-50 text-blue-500 hover:bg-blue-500 hover:text-white transition duration-150  rounded-sm flex items-center justify-center;
+}
+
+.btn-active {
+    @apply bg-blue-500 text-white;
+}
+
+.text {
+    @apply text-base font-medium   text-gray-700;
+}
+.form-input {
+    @apply shadow appearance-none border  rounded w-full py-2 px-3;
 }
 </style>
