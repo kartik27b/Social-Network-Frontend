@@ -63,6 +63,7 @@ module.exports = {
             72: "18rem",
             80: "20rem",
             96: "24rem",
+            182: "38rem",
         },
         animation: {
             none: "none",
@@ -246,6 +247,7 @@ module.exports = {
         flex: {
             1: "1 1 0%",
             2: "2 2 0%",
+            3: "3 3 0%",
             auto: "1 1 auto",
             initial: "0 1 auto",
             none: "none",

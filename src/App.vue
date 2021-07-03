@@ -1,41 +1,72 @@
 <template>
-    <!-- <div id="nav">
-        <router-link to="/">Home</router-link> |
-        <router-link to="/about">About</router-link>
-    </div> -->
     <div
-        class="w-full h-full   bg-gradient-to-r from-blue-400 bg-blue-600 overflow-hidden"
+        class="w-screen h-screen flex flex-col bg-gradient-to-r from-blue-400 bg-blue-600"
     >
-        <router-view />
+        <snack-bar />
+        <call-snack-bar />
+        <router-view v-if="!attemptingLogin" />
+        <div v-else class="flex-1 items-center justify-center">
+            <ring-loader />
+        </div>
     </div>
 </template>
 
-<style>
-#app {
-    width: 100vw;
-    height: 100vh;
-}
-.no-scrollbar::-webkit-scrollbar {
-    display: none;
-}
+<script>
+import { mapActions } from "vuex";
+import { api } from "../axios_config";
+import CallSnackBar from "./components/CallSnackBar.vue";
+import RingLoader from "./components/RingLoader.vue";
+import SnackBar from "./components/SnackBar.vue";
+import {} from "./sockets";
+export default {
+    name: "app",
+    components: {
+        SnackBar,
+        RingLoader,
+        // Navbar,
+        CallSnackBar,
+    },
+    data() {
+        return {
+            attemptingLogin: false,
+        };
+    },
+    methods: {
+        ...mapActions({
+            snack: "snack/snack",
+        }),
+    },
+    async created() {
+        const token = localStorage.getItem("access_token");
+        if (token) {
+            try {
+                this.attemptingLogin = true;
+                // this.snack({ text: "Logging you in...", type: "success" });
+                const res = await api.get("/auth/loggedin", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                // await simulateDelay();
+                const user = res.data;
 
-.no-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-}
+                this.$store.commit("auth/setAuthenticated", { token, user });
 
-.btn {
-    @apply focus:outline-none px-3 py-1 bg-blue-50 text-blue-500 hover:bg-blue-500 hover:text-white transition duration-150  rounded-sm flex items-center justify-center;
-}
+                await this.$store.dispatch("LOAD_DATA");
+                this.loadingData = false;
 
-.btn-active {
-    @apply bg-blue-500 text-white;
-}
+                this.attemptingLogin = false;
+                this.$router.push({ name: "Home" });
+            } catch (e) {
+                // this.snack({
+                //     text: "Some error occured, Please login again!",
+                //     type: "error",
+                // });
+                this.attemptingLogin = false;
 
-.text {
-    @apply text-base font-medium   text-gray-700;
-}
-.form-input {
-    @apply shadow appearance-none border  rounded w-full py-2 px-3;
-}
-</style>
+                console.log(e);
+            }
+        }
+    },
+};
+</script>
+
+<style></style>

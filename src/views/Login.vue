@@ -1,34 +1,21 @@
 <template>
     <div class="w-full h-full flex items-center justify-center">
         <fade-transition>
-            <ring-loader v-if="performCall"></ring-loader>
+            <ring-loader v-if="performCall" />
 
             <div
                 v-else
                 class="bg-white px-10 py-5 rounded-md shadow-2xl min-w-xl"
             >
                 <fade-transition>
-                    <component :is="whichForm" />
+                    <component
+                        :is="whichForm"
+                        @show-form="handleShowForm"
+                        @perform-signup="perfomSignup"
+                        @perform-login="perfomLogin"
+                    />
                 </fade-transition>
-                <div class="flex items-center justify-between">
-                    <button
-                        class="btn "
-                        :class="{ 'btn-active': onLogin }"
-                        type="button"
-                        @click="handleFormInput('login')"
-                    >
-                        Login
-                    </button>
-
-                    <button
-                        class="btn"
-                        :class="{ 'btn-active': !onLogin }"
-                        type="button"
-                        @click="handleFormInput('signup')"
-                    >
-                        Sign Up
-                    </button>
-                </div>
+                <!-- <button @click="doSomething">Show snack</button> -->
             </div>
         </fade-transition>
     </div>
@@ -36,12 +23,15 @@
 
 <script>
 import OrbitLoader from "../components/OrbitLoader.vue";
-// // TODO: add signup
 import myLogin from "../components/my-login.vue";
 import mySignup from "../components/my-signup.vue";
 import FadeTransition from "../components/FadeTransition.vue";
 import { simulateDelay } from "../../extras";
 import RingLoader from "../components/RingLoader.vue";
+
+import { api } from "../../axios_config";
+import { mapActions } from "vuex";
+
 export default {
     components: {
         myLogin,
@@ -63,34 +53,74 @@ export default {
         };
     },
     methods: {
-        async perfomLogin() {
-            await simulateDelay();
-            this.$router.push({ name: "Home" });
-            // this.performCall = false;
+        ...mapActions({
+            snack: "snack/snack",
+        }),
+        doSomething() {
+            this.snack({ text: "this is a snack", type: "success" });
         },
-        async perfomSignup() {
-            await simulateDelay();
-            this.$router.push({ name: "Home" });
-            // this.performCall = false;
-        },
-        handleFormInput(val) {
-            if (val === "login") {
-                if (this.onLogin) {
-                    console.log("perfom login ...");
-                    this.performCall = true;
-                    this.perfomLogin();
-                } else {
-                    this.onLogin = true;
-                }
-            } else if (val === "signup") {
-                if (!this.onLogin) {
-                    console.log("perfom signup ...");
-                    this.performCall = true;
-                    this.perfomSignup();
-                } else {
-                    this.onLogin = false;
-                }
+        handleShowForm(event) {
+            if (event === "login") {
+                this.onLogin = true;
+            } else if (event === "signup") {
+                this.onLogin = false;
             }
+            console.log("show", event);
+        },
+        async perfomLogin({ username, password }) {
+            this.performCall = true;
+            try {
+                const res = await api.post("/auth/login", {
+                    username,
+                    password,
+                });
+                console.log(res.data);
+                this.$store.commit("auth/setAuthenticated", {
+                    token: res.data.access_token,
+                    user: res.data.user,
+                });
+                await this.$store.dispatch("LOAD_DATA");
+                this.loadingData = false;
+                console.log("it workds");
+
+                this.$router.push({ name: "Home" });
+            } catch (e) {
+                this.snack({
+                    text: "Incorrect username or password",
+                    type: "error",
+                });
+                console.log(e);
+            }
+
+            await simulateDelay();
+
+            this.performCall = false;
+        },
+        async perfomSignup({ username, password }) {
+            this.performCall = true;
+            try {
+                const res = await api.post("/users", {
+                    username,
+                    password,
+                });
+                console.log(res.data);
+                this.snack({
+                    text: "User Created Successfully",
+                    type: "success",
+                });
+                this.onLogin = true;
+                // this.$router.push({ name: "Login" });
+            } catch (e) {
+                this.snack({
+                    text: "Something went wrong",
+                    type: "error",
+                });
+                console.log(e);
+            }
+
+            await simulateDelay();
+
+            this.performCall = false;
         },
     },
 };

@@ -1,5 +1,5 @@
 <template>
-    <button class="btn" :class="{ 'btn-active': active }">
+    <button class="btn " :class="{ 'btn-active': active }">
         <!-- <ring-loader v-if="loading"></ring-loader> -->
         <hollow-dots-spinner
             :animation-duration="1000"
@@ -13,10 +13,8 @@
 </template>
 
 <script>
-// import EllipsisLoader from "./EllipsisLoader.vue";
-// import { CirclesToRhombusesSpinner } from "epic-spinners";
 import { HollowDotsSpinner } from "epic-spinners";
-// import RingLoader from "./RingLoader.vue";/
+
 export default {
     name: "b-button",
     props: {
@@ -30,9 +28,6 @@ export default {
         },
     },
     components: {
-        // RingLoader,
-        // EllipsisLoader,
-        // CirclesToRhombusesSpinner,
         HollowDotsSpinner,
     },
     computed: {
